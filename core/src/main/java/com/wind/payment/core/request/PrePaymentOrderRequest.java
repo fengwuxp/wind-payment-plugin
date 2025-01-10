@@ -22,7 +22,7 @@ public class PrePaymentOrderRequest implements Serializable {
      * 应用内的交易流水号
      */
     @NotBlank
-    private String transactionNo;
+    private String transactionSn;
 
     /**
      * 支付用户标识

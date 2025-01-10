@@ -18,20 +18,20 @@ public class QueryTransactionOrderRefundRequest implements Serializable {
     /**
      * 应用内的交易流水号
      */
-    private String transactionNo;
+    private String transactionSn;
 
     /**
      * 第三方交易流水号
      */
-    private String outTransactionNo;
+    private String outTransactionSn;
 
     /**
      * 交易退款流水号
      */
-    private String requestRefundNo;
+    private String requestRefundSn;
 
     /**
      * 第三方退款流水号
      */
-    private String outTransactionRefundNo;
+    private String outTransactionRefundSn;
 }

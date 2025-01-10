@@ -22,7 +22,7 @@ public class PaymentTransactionRefundNoticeRequest implements Serializable {
      * 应用内的交易退款流水号
      */
     @NotBlank
-    private String transactionRefundNo;
+    private String transactionRefundSn;
 
     /**
      * 订单总金额

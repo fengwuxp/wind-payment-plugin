@@ -20,11 +20,11 @@ public class QueryTransactionOrderRequest implements Serializable {
      * 应用内的交易流水号
      */
     @NotBlank
-    private String transactionNo;
+    private String transactionSn;
 
     /**
      * 第三方交易流水号
      */
     @NotBlank
-    private String outTransactionNo;
+    private String outTransactionSn;
 }

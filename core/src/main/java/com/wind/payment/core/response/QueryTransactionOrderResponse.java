@@ -23,12 +23,12 @@ public class QueryTransactionOrderResponse implements Serializable {
      * 支付交易流水号(系统内的)
      */
     @NotNull
-    private String transactionNo;
+    private String transactionSn;
 
     /**
      * 第三方交易流水号
      */
-    private String outTransactionNo;
+    private String outTransactionSn;
 
     /**
      * 订单金额

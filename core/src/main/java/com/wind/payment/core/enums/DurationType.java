@@ -17,7 +17,7 @@ import java.util.TimeZone;
  **/
 @AllArgsConstructor
 @Getter
-public enum ExpireTimeType implements DescriptiveEnum {
+public enum DurationType implements DescriptiveEnum {
 
     MINUTE("m", "分钟"),
 
@@ -51,17 +51,17 @@ public enum ExpireTimeType implements DescriptiveEnum {
     public static Date parseExpireTime(String expr) {
         TimeZone zone = TimeZone.getTimeZone("GMT+8");
         Calendar calendar = Calendar.getInstance(zone);
-        if (expr.endsWith(ExpireTimeType.MINUTE.symbol)) {
-            String m = expr.replace(ExpireTimeType.MINUTE.symbol, WindConstants.EMPTY);
+        if (expr.endsWith(DurationType.MINUTE.symbol)) {
+            String m = expr.replace(DurationType.MINUTE.symbol, WindConstants.EMPTY);
             calendar.add(Calendar.MINUTE, Integer.parseInt(m));
-        } else if (expr.endsWith(ExpireTimeType.HOUR_OF_DAY.symbol)) {
-            String m = expr.replace(ExpireTimeType.HOUR_OF_DAY.symbol, WindConstants.EMPTY);
+        } else if (expr.endsWith(DurationType.HOUR_OF_DAY.symbol)) {
+            String m = expr.replace(DurationType.HOUR_OF_DAY.symbol, WindConstants.EMPTY);
             calendar.add(Calendar.HOUR_OF_DAY, Integer.parseInt(m));
 
-        } else if (expr.endsWith(ExpireTimeType.DAY_OF_YEAR.symbol)) {
-            String m = expr.replace(ExpireTimeType.DAY_OF_YEAR.symbol, WindConstants.EMPTY);
+        } else if (expr.endsWith(DurationType.DAY_OF_YEAR.symbol)) {
+            String m = expr.replace(DurationType.DAY_OF_YEAR.symbol, WindConstants.EMPTY);
             calendar.add(Calendar.DAY_OF_YEAR, Integer.parseInt(m));
-        } else if (expr.endsWith(ExpireTimeType.CURRENT.symbol)) {
+        } else if (expr.endsWith(DurationType.CURRENT.symbol)) {
             calendar.set(Calendar.HOUR, 23);
             calendar.set(Calendar.MINUTE, 59);
             calendar.set(Calendar.SECOND, 59);

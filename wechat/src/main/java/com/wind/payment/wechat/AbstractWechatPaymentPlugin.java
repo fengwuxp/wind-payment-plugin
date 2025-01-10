@@ -19,9 +19,9 @@ import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.payment.core.PaymentTransactionException;
 import com.wind.payment.core.PaymentTransactionPlugin;
-import com.wind.payment.core.enums.ExpireTimeType;
+import com.wind.payment.core.enums.DurationType;
 import com.wind.payment.core.enums.PaymentTransactionState;
-import com.wind.payment.core.request.PaymentTransactionNoticeRequest;
+import com.wind.payment.core.request.PaymentTransactionEventRequest;
 import com.wind.payment.core.request.PaymentTransactionRefundNoticeRequest;
 import com.wind.payment.core.request.QueryTransactionOrderRefundRequest;
 import com.wind.payment.core.request.QueryTransactionOrderRequest;
@@ -110,13 +110,13 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
     @Override
     public QueryTransactionOrderResponse queryTransactionOrder(QueryTransactionOrderRequest request) {
         try {
-            WxPayOrderQueryResult response = wxPayService.queryOrder(request.getOutTransactionNo(), request.getTransactionNo());
+            WxPayOrderQueryResult response = wxPayService.queryOrder(request.getOutTransactionSn(), request.getTransactionSn());
             if (log.isDebugEnabled()) {
-                log.debug("查询微信支付结果，transactionNo = {}，响应：{}", request.getTransactionNo(), response);
+                log.debug("查询微信支付结果，transactionNo = {}，响应：{}", request.getTransactionSn(), response);
             }
             QueryTransactionOrderResponse result = new QueryTransactionOrderResponse();
-            return result.setOutTransactionNo(response.getTransactionId())
-                    .setOutTransactionNo(response.getOutTradeNo())
+            return result.setOutTransactionSn(response.getTransactionId())
+                    .setOutTransactionSn(response.getOutTradeNo())
                     .setOrderAmount(response.getTotalFee())
                     .setBuyerPayAmount(response.getSettlementTotalFee())
                     .setReceiptAmount(response.getSettlementTotalFee())
@@ -124,7 +124,7 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
                     .setUseSandboxEnv(isUseSandboxEnv())
                     .setRawResponse(response);
         } catch (WxPayException exception) {
-            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("查询微信交易单异常，transactionNo = %s", request.getTransactionNo()), exception);
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("查询微信交易单异常，transactionNo = %s", request.getTransactionSn()), exception);
         }
     }
 
@@ -132,84 +132,84 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
     public TransactionOrderRefundResponse transactionOrderRefund(TransactionOrderRefundRequest request) {
         WxPayRefundRequest req = new WxPayRefundRequest();
         req.setRefundFee(request.getRefundAmount());
-        req.setTransactionId(request.getOutTransactionNo());
-        req.setOutTradeNo(request.getTransactionNo());
-        req.setOutRefundNo(request.getTransactionRefundNo());
+        req.setTransactionId(request.getOutTransactionSn());
+        req.setOutTradeNo(request.getTransactionSn());
+        req.setOutRefundNo(request.getTransactionRefundSn());
         req.setTotalFee(request.getOrderAmount());
         req.setNotifyUrl(request.getRefundNotifyUrl());
         req.setRefundDesc(request.getRefundReason());
         try {
             WxPayRefundResult response = wxPayService.refund(req);
             if (log.isDebugEnabled()) {
-                log.debug("微信退款请求结果，transactionNo = {}，响应：{}", request.getTransactionNo(), response);
+                log.debug("微信退款请求结果，transactionNo = {}，响应：{}", request.getTransactionSn(), response);
             }
             TransactionOrderRefundResponse result = new TransactionOrderRefundResponse();
-            return result.setTransactionNo(request.getTransactionNo())
-                    .setTransactionRefundNo(response.getOutRefundNo())
-                    .setOutTransactionRefundNo(response.getRefundId())
+            return result.setTransactionSn(request.getTransactionSn())
+                    .setTransactionRefundSn(response.getOutRefundNo())
+                    .setOutTransactionRefundSn(response.getRefundId())
                     .setRefundAmount(response.getRefundFee())
                     .setOrderAmount(response.getTotalFee())
                     .setTransactionState(PaymentTransactionState.WAIT_REFUND)
                     .setRawResponse(response);
         } catch (WxPayException exception) {
-            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("微信交易退款异常，transactionNo = %s", request.getTransactionNo()), exception);
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("微信交易退款异常，transactionNo = %s", request.getTransactionSn()), exception);
         }
     }
 
     @Override
     public TransactionOrderRefundResponse queryTransactionOrderRefund(QueryTransactionOrderRefundRequest request) {
         WxPayRefundQueryRequest req = new WxPayRefundQueryRequest();
-        req.setTransactionId(request.getOutTransactionNo());
-        req.setOutTradeNo(request.getTransactionNo());
-        req.setOutRefundNo(request.getRequestRefundNo());
-        req.setRefundId(request.getOutTransactionRefundNo());
+        req.setTransactionId(request.getOutTransactionSn());
+        req.setOutTradeNo(request.getTransactionSn());
+        req.setOutRefundNo(request.getRequestRefundSn());
+        req.setRefundId(request.getOutTransactionRefundSn());
         try {
             WxPayRefundQueryResult response = wxPayService.refundQuery(req);
             if (log.isDebugEnabled()) {
-                log.debug("微信退款查询结果，transactionNo = {}，响应：{}", request.getTransactionNo(), response);
+                log.debug("微信退款查询结果，transactionNo = {}，响应：{}", request.getTransactionSn(), response);
             }
             AssertUtils.notEmpty(response.getRefundRecords(), "微信退款记录不存在");
             TransactionOrderRefundResponse result = new TransactionOrderRefundResponse();
             // TODO 处理多次退款的情况
             WxPayRefundQueryResult.RefundRecord refundRecord = response.getRefundRecords().get(0);
-            return result.setTransactionNo(request.getTransactionNo())
-                    .setTransactionRefundNo(refundRecord.getOutRefundNo())
-                    .setOutTransactionRefundNo(refundRecord.getOutRefundNo())
+            return result.setTransactionSn(request.getTransactionSn())
+                    .setTransactionRefundSn(refundRecord.getOutRefundNo())
+                    .setOutTransactionRefundSn(refundRecord.getOutRefundNo())
                     .setRefundAmount(refundRecord.getSettlementRefundFee())
                     .setOrderAmount(response.getTotalFee())
                     .setTransactionState(transformTradeState(refundRecord.getRefundStatus()))
                     .setRawResponse(response);
         } catch (WxPayException exception) {
-            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("查询微信交易退款异常，transactionNo = %s", request.getTransactionNo()), exception);
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("查询微信交易退款异常，transactionNo = %s", request.getTransactionSn()), exception);
         }
     }
 
     @Override
-    public QueryTransactionOrderResponse paymentNotify(PaymentTransactionNoticeRequest request) {
+    public QueryTransactionOrderResponse paymentEvent(PaymentTransactionEventRequest request) {
         WxPayOrderNotifyResult notifyResult = verifyPaymentNotifyRequest(request);
         QueryTransactionOrderResponse result = new QueryTransactionOrderResponse();
-        result.setOutTransactionNo(notifyResult.getTransactionId())
-                .setTransactionNo(notifyResult.getOutTradeNo())
+        result.setOutTransactionSn(notifyResult.getTransactionId())
+                .setTransactionSn(notifyResult.getOutTradeNo())
                 .setOrderAmount(notifyResult.getTotalFee())
                 .setBuyerPayAmount(notifyResult.getSettlementTotalFee())
                 .setUseSandboxEnv(isUseSandboxEnv());
         if (isSuccessful(notifyResult.getReturnCode(), notifyResult.getResultCode())) {
-            result.setTransactionState(PaymentTransactionState.SUCCESS);
+            result.setTransactionState(PaymentTransactionState.COMPLETED);
         } else {
-            result.setTransactionState(PaymentTransactionState.FAILURE);
+            result.setTransactionState(PaymentTransactionState.FAILED);
         }
         result.setRawResponse(notifyResult);
         return result;
     }
 
     @Override
-    public TransactionOrderRefundResponse refundNotice(PaymentTransactionRefundNoticeRequest request) {
+    public TransactionOrderRefundResponse refundEvent(PaymentTransactionRefundNoticeRequest request) {
         // 验签
         WxPayRefundNotifyResult notifyResult = verifyRefundNotifyRequest(request);
         WxPayRefundNotifyResult.ReqInfo reqInfo = notifyResult.getReqInfo();
         TransactionOrderRefundResponse result = new TransactionOrderRefundResponse();
-        result.setTransactionRefundNo(reqInfo.getOutRefundNo())
-                .setOutTransactionRefundNo(reqInfo.getRefundId())
+        result.setTransactionRefundSn(reqInfo.getOutRefundNo())
+                .setOutTransactionRefundSn(reqInfo.getRefundId())
                 .setOrderAmount(reqInfo.getTotalFee())
                 .setRefundAmount(reqInfo.getSettlementRefundFee())
                 .setRawResponse(notifyResult);
@@ -217,14 +217,14 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
             result.setTransactionState(Objects.equals(result.getOrderAmount(), result.getRefundAmount()) ? PaymentTransactionState.REFUNDED : PaymentTransactionState.PARTIAL_REFUND);
 
         } else {
-            result.setTransactionState(PaymentTransactionState.REFUND_FAILURE);
+            result.setTransactionState(PaymentTransactionState.REFUND_FAILED);
         }
         return result;
     }
 
     @Override
-    public Object getHandleResponse(boolean isSuccess) {
-        return isSuccess ? PAYMENT_RESULT_HANDLE_SUCCESS_RETURN_CONTENT :
+    public Object getWebHookResponse(boolean isSuccessful) {
+        return isSuccessful ? PAYMENT_RESULT_HANDLE_SUCCESS_RETURN_CONTENT :
                 PAYMENT_RESULT_HANDLE_FAILURE_RETURN_CONTENT;
     }
 
@@ -235,13 +235,13 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
      */
     private PaymentTransactionState transformTradeState(String tradeState) {
         if (tradeState.equals(WeChatTradeSate.SUCCESS.name())) {
-            return PaymentTransactionState.SUCCESS;
+            return PaymentTransactionState.COMPLETED;
         }
         if (tradeState.equals(WeChatTradeSate.REFUND.name())) {
             return PaymentTransactionState.WAIT_REFUND;
         }
         if (tradeState.equals(WeChatTradeSate.NOTPAY.name())) {
-            return PaymentTransactionState.NOT_PAY;
+            return PaymentTransactionState.WAIT_PAY;
         }
         if (tradeState.equals(WeChatTradeSate.CLOSED.name())) {
             return PaymentTransactionState.CLOSED;
@@ -250,10 +250,10 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
             return PaymentTransactionState.CLOSED;
         }
         if (tradeState.equals(WeChatTradeSate.USERPAYING.name())) {
-            return PaymentTransactionState.WAIT_PAY;
+            return PaymentTransactionState.PAYING;
         }
         if (tradeState.equals(WeChatTradeSate.PAYERROR.name())) {
-            return PaymentTransactionState.FAILURE;
+            return PaymentTransactionState.FAILED;
         }
         return PaymentTransactionState.UNKNOWN;
     }
@@ -269,14 +269,14 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
      * @param request 支付通知参数
      * @return WxPayOrderNotifyResult
      */
-    private WxPayOrderNotifyResult verifyPaymentNotifyRequest(PaymentTransactionNoticeRequest request) {
+    private WxPayOrderNotifyResult verifyPaymentNotifyRequest(PaymentTransactionEventRequest request) {
         try {
             WxPayOrderNotifyResult notifyResult = wxPayService.parseOrderNotifyResult(request.getRawRequest());
             boolean verifyResult = Objects.equals(config.getPartner(), notifyResult.getMchId())
-                    && Objects.equals(request.getTransactionNo(), notifyResult.getOutTradeNo())
+                    && Objects.equals(request.getTransactionSn(), notifyResult.getOutTradeNo())
                     && Objects.equals(request.getOrderAmount(), notifyResult.getTotalFee());
             if (log.isDebugEnabled()) {
-                log.debug("微信支付通知，transactionNo = {}，参数验证 = {}，通知内容 = {}", request.getTransactionNo(), verifyResult, notifyResult);
+                log.debug("微信支付通知，transactionNo = {}，参数验证 = {}，通知内容 = {}", request.getTransactionSn(), verifyResult, notifyResult);
             }
             AssertUtils.isTrue(verifyResult, "参数验证失败");
             // 验签
@@ -298,9 +298,9 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
         try {
             WxPayRefundNotifyResult notifyResult = wxPayService.parseRefundNotifyResult(request.getRawRequest());
             boolean verifyResult = Objects.equals(config.getPartner(), notifyResult.getMchId())
-                    && Objects.equals(request.getTransactionRefundNo(), notifyResult.getReqInfo().getOutRefundNo());
+                    && Objects.equals(request.getTransactionRefundSn(), notifyResult.getReqInfo().getOutRefundNo());
             if (log.isDebugEnabled()) {
-                log.debug("微信退款通知，transactionRefundNo = {}，参数验证 = {}，通知内容 = {}", request.getTransactionRefundNo(), verifyResult, notifyResult);
+                log.debug("微信退款通知，transactionRefundNo = {}，参数验证 = {}，通知内容 = {}", request.getTransactionRefundSn(), verifyResult, notifyResult);
             }
             AssertUtils.isTrue(verifyResult, "参数验证失败");
             // 验签
@@ -339,8 +339,8 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
     }
 
     static String getExpireTimeOrUseDefault(String timeExpire) {
-        String expr = StringUtils.isNotEmpty(timeExpire) ? timeExpire : ExpireTimeType.MINUTE.getAliRuleDesc(30);
-        return formatDate(ExpireTimeType.parseExpireTime(expr));
+        String expr = StringUtils.isNotEmpty(timeExpire) ? timeExpire : DurationType.MINUTE.getAliRuleDesc(30);
+        return formatDate(DurationType.parseExpireTime(expr));
 
     }
 

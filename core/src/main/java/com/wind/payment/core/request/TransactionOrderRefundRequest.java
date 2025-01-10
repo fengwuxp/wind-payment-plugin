@@ -22,19 +22,19 @@ public class TransactionOrderRefundRequest implements Serializable {
      * 应用内的交易流水号
      */
     @NotBlank
-    private String transactionNo;
+    private String transactionSn;
 
     /**
      * 第三方交易流水号
      */
     @NotBlank
-    private String outTransactionNo;
+    private String outTransactionSn;
 
     /**
      * 应用内的交易退款流水号
      */
     @NotBlank
-    private String transactionRefundNo;
+    private String transactionRefundSn;
 
     /**
      * 退款金额

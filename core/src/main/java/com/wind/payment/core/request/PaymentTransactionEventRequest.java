@@ -13,7 +13,7 @@ import java.io.Serializable;
  * @date 2023-10-01 13:43
  **/
 @Data
-public class PaymentTransactionNoticeRequest implements Serializable {
+public class PaymentTransactionEventRequest implements Serializable {
 
     private static final long serialVersionUID = 7026788394092470016L;
 
@@ -21,7 +21,7 @@ public class PaymentTransactionNoticeRequest implements Serializable {
      * 应用内的交易流水号
      */
     @NotBlank
-    private String transactionNo;
+    private String transactionSn;
 
     /**
      * 订单总金额

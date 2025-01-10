@@ -20,16 +20,15 @@ public class PrePaymentOrderResponse implements Serializable {
      * 支付交易流水号(系统内的)
      */
     @NotNull
-    private String transactionNo;
+    private String transactionSn;
 
     /**
      * 第三方交易流水号
      * <p>
-     * 1：由于支付宝App支付并没有发起真正预下单，该字段要从回掉中获取
+     * 1：由于支付宝 App 支付并没有发起真正预下单，该字段要从回掉中获取
      * </p>
      */
-    private String outTransactionNo;
-
+    private String outTransactionSn;
 
     /**
      * 订单金额

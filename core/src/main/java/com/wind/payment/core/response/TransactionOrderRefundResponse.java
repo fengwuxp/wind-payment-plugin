@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * 支付订单退款响应
@@ -38,17 +39,17 @@ public class TransactionOrderRefundResponse implements Serializable {
     /**
      * 应用内的交易流水号
      */
-    private String transactionNo;
+    private String transactionSn;
 
     /**
      * 应用内的交易退款流水号
      */
-    private String transactionRefundNo;
+    private String transactionRefundSn;
 
     /**
      * 第三方退款流水号
      */
-    private String outTransactionRefundNo;
+    private String outTransactionRefundSn;
 
     /**
      * 原始响应
@@ -59,7 +60,7 @@ public class TransactionOrderRefundResponse implements Serializable {
      * @return 是否全额退款
      */
     public boolean isFullRefund() {
-        return refundAmount.equals(orderAmount);
+        return Objects.deepEquals(orderAmount, refundAmount);
     }
 
     @SuppressWarnings("unchecked")

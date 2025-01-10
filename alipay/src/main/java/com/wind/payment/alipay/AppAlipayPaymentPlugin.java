@@ -40,7 +40,7 @@ public class AppAlipayPaymentPlugin extends AbstractAlipayPaymentPlugin {
         AlipayTradeAppPayRequest req = new AlipayTradeAppPayRequest();
         AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
         model.setProductCode(ALI_APP_PAY_PRODUCT_CODE);
-        model.setOutTradeNo(request.getTransactionNo());
+        model.setOutTradeNo(request.getTransactionSn());
         model.setBody(normalizationBody(request.getDescription()));
         model.setTimeoutExpress(getExpireTimeOrUseDefault(request.getExpireTime()));
         model.setSubject(request.getSubject());
@@ -59,19 +59,19 @@ public class AppAlipayPaymentPlugin extends AbstractAlipayPaymentPlugin {
                 log.debug("支付响应 :{}", response);
             }
             if (response.isSuccess()) {
-                result.setTransactionNo(request.getTransactionNo())
-                        .setOutTransactionNo(response.getTradeNo())
+                result.setTransactionSn(request.getTransactionSn())
+                        .setOutTransactionSn(response.getTradeNo())
                         .setUseSandboxEnv(this.isUseSandboxEnv())
                         .setOrderAmount(request.getOrderAmount())
                         .setResult(response.getBody())
                         .setRawResponse(response);
             } else {
                 throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("支付宝 App 支付交易失败，transactionNo = %s。" +
-                        ERROR_PATTERN, request.getTransactionNo(), response.getCode(), response.getMsg()));
+                        ERROR_PATTERN, request.getTransactionSn(), response.getCode(), response.getMsg()));
             }
 
         } catch (AlipayApiException exception) {
-            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("支付宝 App 支付交易异常，transactionNo = %s。", request.getTransactionNo()), exception);
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("支付宝 App 支付交易异常，transactionNo = %s。", request.getTransactionSn()), exception);
         }
 
         return result;

@@ -35,10 +35,10 @@ public class WebPageWechatPaymentPlugin extends AbstractWechatPaymentPlugin {
         req.setNotifyUrl(request.getNotifyUrl());
         req.setTradeType(WechatPayScene.MWEB.name());
         req.setBody(normalizationBody(request.getDescription()));
-        req.setOutTradeNo(request.getTransactionNo());
+        req.setOutTradeNo(request.getTransactionSn());
         req.setTotalFee(request.getOrderAmount());
         req.setSpbillCreateIp(request.getRemoteIp());
-        req.setProductId(request.getTransactionNo());
+        req.setProductId(request.getTransactionSn());
         req.setTimeExpire(getExpireTimeOrUseDefault(request.getExpireTime()));
         req.setSceneInfo(request.getSceneInfo());
         try {
@@ -48,11 +48,11 @@ public class WebPageWechatPaymentPlugin extends AbstractWechatPaymentPlugin {
             }
             result.setResult(orderResult.getMwebUrl())
                     .setOrderAmount(request.getOrderAmount())
-                    .setTransactionNo(request.getTransactionNo())
+                    .setTransactionSn(request.getTransactionSn())
                     .setUseSandboxEnv(isUseSandboxEnv())
                     .setRawResponse(orderResult.getMwebUrl());
         } catch (WxPayException exception) {
-            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("微信网页支付交易异常，transactionNo = %s。", request.getTransactionNo()), exception);
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("微信网页支付交易异常，transactionNo = %s。", request.getTransactionSn()), exception);
         }
         return result;
     }

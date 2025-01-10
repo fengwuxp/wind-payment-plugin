@@ -1,6 +1,6 @@
 package com.wind.payment.core;
 
-import com.wind.payment.core.request.PaymentTransactionNoticeRequest;
+import com.wind.payment.core.request.PaymentTransactionEventRequest;
 import com.wind.payment.core.request.PaymentTransactionRefundNoticeRequest;
 import com.wind.payment.core.response.QueryTransactionOrderResponse;
 import com.wind.payment.core.response.TransactionOrderRefundResponse;
@@ -20,7 +20,7 @@ public interface PaymentTransactionWebHooker {
      * @param request 支付通知请求参数
      * @return 处理响应
      */
-    QueryTransactionOrderResponse paymentNotify(PaymentTransactionNoticeRequest request);
+    QueryTransactionOrderResponse paymentEvent(PaymentTransactionEventRequest request);
 
     /**
      * 退款通知
@@ -28,14 +28,14 @@ public interface PaymentTransactionWebHooker {
      * @param request 退款通知请求参数
      * @return 处理响应
      */
-    TransactionOrderRefundResponse refundNotice(PaymentTransactionRefundNoticeRequest request);
+    TransactionOrderRefundResponse refundEvent(PaymentTransactionRefundNoticeRequest request);
 
     /**
-     * 获取通知处理返回对象
+     * 获取通知处理响应
      *
-     * @param isSuccess 是否处理成功
-     * @return 处理成功响应
+     * @param isSuccessful 是否处理成功
+     * @return 处响应
      */
-    Object getHandleResponse(boolean isSuccess);
+    Object getWebHookResponse(boolean isSuccessful);
 
 }

@@ -14,24 +14,30 @@ import lombok.Getter;
 @Getter
 public enum PaymentTransactionState implements DescriptiveEnum {
 
+    /**
+     * 已关闭
+     */
     CLOSED("已关闭"),
 
-    NOT_PAY("未支付"),
+    /**
+     * 待支付
+     */
+    WAIT_PAY("待支付"),
 
     /**
      * 支付中
      */
-    WAIT_PAY("支付中"),
+    PAYING("支付中"),
 
     /**
      * 支付成功
      */
-    SUCCESS("支付成功"),
+    COMPLETED("支付成功"),
 
     /**
      * 支付失败
      */
-    FAILURE("支付失败"),
+    FAILED("支付失败"),
 
     /**
      * 退款等待中
@@ -48,8 +54,10 @@ public enum PaymentTransactionState implements DescriptiveEnum {
      */
     REFUNDED("已退款"),
 
-
-    REFUND_FAILURE("退款失败"),
+    /**
+     * 退款失败
+     */
+    REFUND_FAILED("退款失败"),
 
     /**
      * 未知状态
@@ -57,4 +65,5 @@ public enum PaymentTransactionState implements DescriptiveEnum {
     UNKNOWN("未知");
 
     private final String desc;
+
 }

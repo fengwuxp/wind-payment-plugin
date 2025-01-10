@@ -46,7 +46,7 @@ public class AuthCodeAlipayPaymentPlugin extends AbstractAlipayPaymentPlugin {
         model.setTimeoutExpress(getExpireTimeOrUseDefault(request.getExpireTime()));
         model.setSubject(request.getSubject());
         model.setTotalAmount(PaymentTransactionUtils.feeToYun(request.getOrderAmount()).toString());
-        model.setOutTradeNo(request.getTransactionNo());
+        model.setOutTradeNo(request.getTransactionSn());
         model.setScene(authCodeRequest.getScene());
         model.setAuthCode(authCodeRequest.getAuthCode());
         req.setBizModel(model);
@@ -62,17 +62,17 @@ public class AuthCodeAlipayPaymentPlugin extends AbstractAlipayPaymentPlugin {
                 log.debug("支付响应 :{}", response);
             }
             if (response.isSuccess()) {
-                result.setTransactionNo(response.getOutTradeNo())
-                        .setOutTransactionNo(response.getTradeNo())
+                result.setTransactionSn(response.getOutTradeNo())
+                        .setOutTransactionSn(response.getTradeNo())
                         .setUseSandboxEnv(this.isUseSandboxEnv())
                         .setOrderAmount(PaymentTransactionUtils.yuanToFee(response.getTotalAmount()))
                         .setRawResponse(response);
             } else {
                 throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("支付宝授权码支付交易失败，transactionNo = %s。" +
-                        ERROR_PATTERN, request.getTransactionNo(), response.getCode(), response.getMsg()));
+                        ERROR_PATTERN, request.getTransactionSn(), response.getCode(), response.getMsg()));
             }
         } catch (AlipayApiException exception) {
-            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("支付宝授权码支付交易异常，transactionNo = %s。", request.getTransactionNo()), exception);
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("支付宝授权码支付交易异常，transactionNo = %s。", request.getTransactionSn()), exception);
         }
         return result;
     }
