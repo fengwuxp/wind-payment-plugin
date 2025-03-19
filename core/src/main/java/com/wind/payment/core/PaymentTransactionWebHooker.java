@@ -13,7 +13,6 @@ import com.wind.payment.core.response.TransactionOrderRefundResponse;
  **/
 public interface PaymentTransactionWebHooker {
 
-
     /**
      * 支付通知
      *
@@ -31,10 +30,10 @@ public interface PaymentTransactionWebHooker {
     TransactionOrderRefundResponse refundEvent(PaymentTransactionRefundNoticeRequest request);
 
     /**
-     * 获取通知处理响应
+     * 通知的处理响应
      *
-     * @param isSuccessful 是否处理成功
-     * @return 处响应
+     * @param isSuccessful 业务处理是否成功
+     * @return 处理响应
      */
     Object getWebHookResponse(boolean isSuccessful);
 

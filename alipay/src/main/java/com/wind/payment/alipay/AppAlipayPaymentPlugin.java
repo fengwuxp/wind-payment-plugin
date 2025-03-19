@@ -42,7 +42,7 @@ public class AppAlipayPaymentPlugin extends AbstractAlipayPaymentPlugin {
         model.setProductCode(ALI_APP_PAY_PRODUCT_CODE);
         model.setOutTradeNo(request.getTransactionSn());
         model.setBody(normalizationBody(request.getDescription()));
-        model.setTimeoutExpress(getExpireTimeOrUseDefault(request.getExpireTime()));
+        model.setTimeExpire(getExpireTimeOrUseDefault(request.getExpireTime()));
         model.setSubject(request.getSubject());
         model.setTotalAmount(PaymentTransactionUtils.feeToYun(request.getOrderAmount()).toString());
         req.setBizModel(model);
@@ -71,9 +71,9 @@ public class AppAlipayPaymentPlugin extends AbstractAlipayPaymentPlugin {
             }
 
         } catch (AlipayApiException exception) {
-            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("支付宝 App 支付交易异常，transactionNo = %s。", request.getTransactionSn()), exception);
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("支付宝 App 支付交易异常，transactionNo = %s。",
+                    request.getTransactionSn()), exception);
         }
-
         return result;
     }
 }

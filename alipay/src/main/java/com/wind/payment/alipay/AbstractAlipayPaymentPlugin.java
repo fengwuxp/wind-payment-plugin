@@ -17,10 +17,9 @@ import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.DefaultExceptionCode;
-import com.wind.payment.alipay.notice.AlipayAsyncNoticeRequest;
+import com.wind.payment.alipay.notification.AlipayAsyncNotificationRequest;
 import com.wind.payment.core.PaymentTransactionException;
 import com.wind.payment.core.PaymentTransactionPlugin;
-import com.wind.payment.core.enums.DurationType;
 import com.wind.payment.core.enums.PaymentTransactionState;
 import com.wind.payment.core.request.PaymentTransactionEventRequest;
 import com.wind.payment.core.request.PaymentTransactionRefundNoticeRequest;
@@ -33,8 +32,12 @@ import com.wind.payment.core.util.PaymentTransactionUtils;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -58,9 +61,12 @@ public abstract class AbstractAlipayPaymentPlugin implements PaymentTransactionP
      */
     private static final String PAYMENT_RESULT_HANDLE_FAILURE_RETURN_CODE = "failure";
 
+    private static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
+
     static final String ERROR_PATTERN = "errorCode：%s，errorMessage：%s";
 
     private static final String ALI_PAY_DEV = "alipaydev";
+
 
     private final AliPayPartnerConfig config;
 
@@ -112,7 +118,8 @@ public abstract class AbstractAlipayPaymentPlugin implements PaymentTransactionP
                         ERROR_PATTERN, request.getTransactionSn(), response.getCode(), response.getMsg()));
             }
         } catch (AlipayApiException exception) {
-            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("查询支付宝交易单异常，transactionNo = %s", request.getTransactionSn()), exception);
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("查询支付宝交易单异常，transactionNo = %s",
+                    request.getTransactionSn()), exception);
         }
         return result;
     }
@@ -156,7 +163,8 @@ public abstract class AbstractAlipayPaymentPlugin implements PaymentTransactionP
             }
             result.setRawResponse(response);
         } catch (AlipayApiException exception) {
-            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("支付宝交易退款异常，transactionNo = %s", request.getTransactionSn()), exception);
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("支付宝交易退款异常，transactionNo = %s",
+                    request.getTransactionSn()), exception);
         }
 
         return result;
@@ -184,14 +192,17 @@ public abstract class AbstractAlipayPaymentPlugin implements PaymentTransactionP
                         .setOutTransactionRefundSn(response.getOutRequestNo())
                         .setRefundAmount(refundAmount)
                         .setOrderAmount(orderAmount)
-                        .setTransactionState(Objects.equals(refundAmount, orderAmount) ? PaymentTransactionState.REFUNDED : PaymentTransactionState.PARTIAL_REFUND)
+                        .setTransactionState(Objects.equals(refundAmount, orderAmount) ? PaymentTransactionState.REFUNDED :
+                                PaymentTransactionState.PARTIAL_REFUND)
                         .setRawResponse(response);
             } else {
                 throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR,
-                        String.format("查询支付宝交易退款失败，transactionNo = %s。" + ERROR_PATTERN, request.getTransactionSn(), response.getCode(), response.getMsg()));
+                        String.format("查询支付宝交易退款失败，transactionNo = %s。" + ERROR_PATTERN, request.getTransactionSn(), response.getCode(),
+                                response.getMsg()));
             }
         } catch (AlipayApiException exception) {
-            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("查询支付宝交易退款异常，transactionNo = %s", request.getTransactionSn()), exception);
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("查询支付宝交易退款异常，transactionNo = %s",
+                    request.getTransactionSn()), exception);
         }
         return result;
     }
@@ -200,7 +211,7 @@ public abstract class AbstractAlipayPaymentPlugin implements PaymentTransactionP
     public QueryTransactionOrderResponse paymentEvent(PaymentTransactionEventRequest request) {
         verifyPaymentNotifyRequest(request);
         QueryTransactionOrderResponse result = new QueryTransactionOrderResponse();
-        AlipayAsyncNoticeRequest noticeRequest = request.getRawRequest();
+        AlipayAsyncNotificationRequest noticeRequest = request.getRawRequest();
         result.setOutTransactionSn(noticeRequest.getTrade_no())
                 .setTransactionSn(noticeRequest.getOut_trade_no())
                 .setOrderAmount(PaymentTransactionUtils.yuanToFee(noticeRequest.getTotal_amount()));
@@ -230,7 +241,7 @@ public abstract class AbstractAlipayPaymentPlugin implements PaymentTransactionP
         verifyRefundNotifyRequest(request);
         // 退款处理订单通知
         TransactionOrderRefundResponse result = new TransactionOrderRefundResponse();
-        AlipayAsyncNoticeRequest noticeRequest = request.getRawRequest();
+        AlipayAsyncNotificationRequest noticeRequest = request.getRawRequest();
         result.setTransactionRefundSn(request.getTransactionRefundSn());
         result.setOutTransactionRefundSn(noticeRequest.getOut_biz_no());
         result.setOrderAmount(PaymentTransactionUtils.yuanToFee(noticeRequest.getTotal_amount()));
@@ -286,7 +297,7 @@ public abstract class AbstractAlipayPaymentPlugin implements PaymentTransactionP
     private void verifyPaymentNotifyRequest(PaymentTransactionEventRequest request) {
         // 参数验证
         String tradeNo = request.getTransactionSn();
-        AlipayAsyncNoticeRequest rawRequest = request.getRawRequest();
+        AlipayAsyncNotificationRequest rawRequest = request.getRawRequest();
         BigDecimal orderAmount = PaymentTransactionUtils.feeToYun(request.getOrderAmount());
         boolean paramVerify = Objects.equals(tradeNo, rawRequest.getOut_trade_no())
                 && Objects.equals(orderAmount, rawRequest.getTotal_amount());
@@ -316,7 +327,7 @@ public abstract class AbstractAlipayPaymentPlugin implements PaymentTransactionP
      *
      * @param request 回调参数
      */
-    private void verifySign(AlipayAsyncNoticeRequest request) {
+    private void verifySign(AlipayAsyncNotificationRequest request) {
         // 签名验证
         Map<String, String> signParams = new HashMap<>();
         // 深 Copy
@@ -333,8 +344,8 @@ public abstract class AbstractAlipayPaymentPlugin implements PaymentTransactionP
             // 切记 rsaPublicKey 是支付宝的公钥，请去 open.alipay.com 对应应用下查看。
             boolean result = AlipaySignature.rsaCheckV1(signParams, config.getRsaPublicKey(), config.getCharset(), signType.name());
             AssertUtils.isTrue(result, "支付宝通知签名验证失败");
-        } catch (AlipayApiException e) {
-            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, "支付宝支付通知签名验证异常", e);
+        } catch (AlipayApiException exception) {
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, "支付宝支付通知签名验证异常", exception);
         }
     }
 
@@ -342,8 +353,11 @@ public abstract class AbstractAlipayPaymentPlugin implements PaymentTransactionP
         return StringUtils.abbreviate(description, 128);
     }
 
-    static String getExpireTimeOrUseDefault(String expireTime) {
-        // 默认 30 分钟过期
-        return StringUtils.isNotEmpty(expireTime) ? expireTime : DurationType.MINUTE.getAliRuleDesc(30);
+    @NotNull
+    static String getExpireTimeOrUseDefault(Duration expireTime) {
+        if (expireTime == null) {
+            expireTime = Duration.ofMinutes(30);
+        }
+        return DateFormatUtils.format(new Date(System.currentTimeMillis() + expireTime.toMillis()), DATE_FORMAT_PATTERN);
     }
 }

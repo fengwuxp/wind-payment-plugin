@@ -37,7 +37,7 @@ public class QrCodeAlipayPaymentPlugin extends AbstractAlipayPaymentPlugin {
         AlipayTradePrecreateModel model = new AlipayTradePrecreateModel();
         model.setOutTradeNo(request.getTransactionSn());
         model.setBody(normalizationBody(request.getDescription()));
-        model.setTimeoutExpress(getExpireTimeOrUseDefault(request.getExpireTime()));
+        model.setTimeExpire(getExpireTimeOrUseDefault(request.getExpireTime()));
         model.setSubject(request.getSubject());
         model.setTotalAmount(PaymentTransactionUtils.feeToYun(request.getOrderAmount()).toString());
         req.setBizModel(model);

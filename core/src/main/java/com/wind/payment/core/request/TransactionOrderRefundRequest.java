@@ -1,6 +1,8 @@
 package com.wind.payment.core.request;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -14,7 +16,9 @@ import java.io.Serializable;
  * @date 2023-09-30 19:47
  **/
 @Data
-public class TransactionOrderRefundRequest implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class TransactionOrderRefundRequest extends AbstractPaymentContextVariables implements Serializable {
 
     private static final long serialVersionUID = 8514897252783130486L;
 

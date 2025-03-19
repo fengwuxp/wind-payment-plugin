@@ -19,7 +19,6 @@ import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.payment.core.PaymentTransactionException;
 import com.wind.payment.core.PaymentTransactionPlugin;
-import com.wind.payment.core.enums.DurationType;
 import com.wind.payment.core.enums.PaymentTransactionState;
 import com.wind.payment.core.request.PaymentTransactionEventRequest;
 import com.wind.payment.core.request.PaymentTransactionRefundNoticeRequest;
@@ -34,6 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
+import javax.validation.constraints.NotNull;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -124,7 +125,8 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
                     .setUseSandboxEnv(isUseSandboxEnv())
                     .setRawResponse(response);
         } catch (WxPayException exception) {
-            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("查询微信交易单异常，transactionNo = %s", request.getTransactionSn()), exception);
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("查询微信交易单异常，transactionNo = %s",
+                    request.getTransactionSn()), exception);
         }
     }
 
@@ -152,7 +154,8 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
                     .setTransactionState(PaymentTransactionState.WAIT_REFUND)
                     .setRawResponse(response);
         } catch (WxPayException exception) {
-            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("微信交易退款异常，transactionNo = %s", request.getTransactionSn()), exception);
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("微信交易退款异常，transactionNo = %s",
+                    request.getTransactionSn()), exception);
         }
     }
 
@@ -180,7 +183,8 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
                     .setTransactionState(transformTradeState(refundRecord.getRefundStatus()))
                     .setRawResponse(response);
         } catch (WxPayException exception) {
-            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("查询微信交易退款异常，transactionNo = %s", request.getTransactionSn()), exception);
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("查询微信交易退款异常，transactionNo = %s",
+                    request.getTransactionSn()), exception);
         }
     }
 
@@ -214,7 +218,8 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
                 .setRefundAmount(reqInfo.getSettlementRefundFee())
                 .setRawResponse(notifyResult);
         if (isSuccessful(notifyResult.getReturnCode(), notifyResult.getResultCode())) {
-            result.setTransactionState(Objects.equals(result.getOrderAmount(), result.getRefundAmount()) ? PaymentTransactionState.REFUNDED : PaymentTransactionState.PARTIAL_REFUND);
+            result.setTransactionState(Objects.equals(result.getOrderAmount(), result.getRefundAmount()) ? PaymentTransactionState.REFUNDED :
+                    PaymentTransactionState.PARTIAL_REFUND);
 
         } else {
             result.setTransactionState(PaymentTransactionState.REFUND_FAILED);
@@ -338,16 +343,11 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
         return StringUtils.abbreviate(description.replaceAll("[^0-9a-zA-Z\\u4e00-\\u9fa5 ]", ""), 600);
     }
 
-    static String getExpireTimeOrUseDefault(String timeExpire) {
-        String expr = StringUtils.isNotEmpty(timeExpire) ? timeExpire : DurationType.MINUTE.getAliRuleDesc(30);
-        return formatDate(DurationType.parseExpireTime(expr));
-
-    }
-
-    private static String formatDate(Date date) {
-        if (date == null) {
-            return null;
+    @NotNull
+    static String getExpireTimeOrUseDefault(Duration expireTime) {
+        if (expireTime == null) {
+            expireTime = Duration.ofMinutes(30);
         }
-        return DateFormatUtils.format(date, DATE_FORMAT_PATTERN);
+        return DateFormatUtils.format(new Date(System.currentTimeMillis() + expireTime.toMillis()), DATE_FORMAT_PATTERN);
     }
 }

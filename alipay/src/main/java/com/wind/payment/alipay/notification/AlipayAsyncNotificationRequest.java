@@ -1,4 +1,4 @@
-package com.wind.payment.alipay.notice;
+package com.wind.payment.alipay.notification;
 
 import com.wind.payment.alipay.AliPayPartnerConfig;
 import com.wind.payment.alipay.AliPayTransactionState;
@@ -15,7 +15,7 @@ import java.util.Date;
  * @date 2023-10-01 14:49
  **/
 @Data
-public class AlipayAsyncNoticeRequest {
+public class AlipayAsyncNotificationRequest {
 
     /**
      * 通知时间。通知的发送时间。格式为 yyyy-MM-dd HH:mm:ss。

@@ -60,7 +60,7 @@ public class TransactionOrderRefundResponse implements Serializable {
      * @return 是否全额退款
      */
     public boolean isFullRefund() {
-        return Objects.deepEquals(orderAmount, refundAmount);
+        return Objects.equals(orderAmount, refundAmount);
     }
 
     @SuppressWarnings("unchecked")

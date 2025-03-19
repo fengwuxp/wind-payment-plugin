@@ -1,11 +1,14 @@
 package com.wind.payment.core.request;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.time.Duration;
 
 /**
  * 预下单支付请求
@@ -14,7 +17,9 @@ import java.io.Serializable;
  * @date 2023-09-30 19:27
  **/
 @Data
-public class PrePaymentOrderRequest implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class PrePaymentOrderRequest extends AbstractPaymentContextVariables implements Serializable {
 
     private static final long serialVersionUID = 6802966138298876457L;
 
@@ -50,14 +55,11 @@ public class PrePaymentOrderRequest implements Serializable {
     private String asynchronousNotificationUrl;
 
     /**
-     * 交易结束时间
-     * 使用阿里规则
-     * 1m～15d。m-分钟，h-小时，d-天，1c-当天（1c-当天的情况下，无论交易何时创建，都在0点关闭）
-     * <p>
-     * 默认：30m，  30分钟过期
+     * 订单有效期
+     * 默认：15 分钟
      */
     @NotBlank
-    private String expireTime = "30m";
+    private Duration expireTime = Duration.ofMinutes(15);
 
     /**
      * 支付说明
@@ -75,7 +77,7 @@ public class PrePaymentOrderRequest implements Serializable {
     private String productShowUrl;
 
     /**
-     * 主题
+     * 订单主题
      */
     private String subject;
 
@@ -83,4 +85,6 @@ public class PrePaymentOrderRequest implements Serializable {
      * 支付场景说明
      */
     private String sceneInfo;
+
+
 }
