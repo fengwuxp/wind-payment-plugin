@@ -53,10 +53,10 @@ public class TransactionOrderRefundRequest implements Serializable {
     private Integer orderAmount;
 
     /**
-     * 退款通知 url
+     * 退款异步通知 url
      */
     @NotBlank
-    private String refundNotifyUrl;
+    private String asynchronousNotificationUrl;
 
     /**
      * 退款原因

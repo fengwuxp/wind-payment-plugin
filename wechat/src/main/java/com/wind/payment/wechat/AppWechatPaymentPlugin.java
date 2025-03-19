@@ -33,12 +33,12 @@ public class AppWechatPaymentPlugin extends AbstractWechatPaymentPlugin {
     public PrePaymentOrderResponse preOrder(PrePaymentOrderRequest request) {
         PrePaymentOrderResponse result = new PrePaymentOrderResponse();
         WxPayUnifiedOrderRequest req = new WxPayUnifiedOrderRequest();
-        req.setNotifyUrl(request.getNotifyUrl());
+        req.setNotifyUrl(request.getAsynchronousNotificationUrl());
         req.setTradeType(WechatPayScene.APP.name());
         req.setBody(normalizationBody(request.getDescription()));
         req.setOutTradeNo(request.getTransactionSn());
         req.setTotalFee(request.getOrderAmount());
-        req.setSpbillCreateIp(request.getRemoteIp());
+        req.setSpbillCreateIp(request.getRequestSourceIp());
         req.setProductId(request.getTransactionSn());
         req.setTimeExpire(getExpireTimeOrUseDefault(request.getExpireTime()));
         try {

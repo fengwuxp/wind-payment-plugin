@@ -50,8 +50,8 @@ public class AuthCodeAlipayPaymentPlugin extends AbstractAlipayPaymentPlugin {
         model.setScene(authCodeRequest.getScene());
         model.setAuthCode(authCodeRequest.getAuthCode());
         req.setBizModel(model);
-        req.setNotifyUrl(request.getNotifyUrl());
-        req.setReturnUrl(request.getReturnUrl());
+        req.setNotifyUrl(request.getAsynchronousNotificationUrl());
+        req.setReturnUrl(request.getSynchronousCallbackUrl());
         if (log.isDebugEnabled()) {
             log.debug("支付请求参数：{}", req);
         }

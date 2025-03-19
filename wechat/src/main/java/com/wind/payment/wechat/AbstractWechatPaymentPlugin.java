@@ -136,7 +136,7 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
         req.setOutTradeNo(request.getTransactionSn());
         req.setOutRefundNo(request.getTransactionRefundSn());
         req.setTotalFee(request.getOrderAmount());
-        req.setNotifyUrl(request.getRefundNotifyUrl());
+        req.setNotifyUrl(request.getAsynchronousNotificationUrl());
         req.setRefundDesc(request.getRefundReason());
         try {
             WxPayRefundResult response = wxPayService.refund(req);

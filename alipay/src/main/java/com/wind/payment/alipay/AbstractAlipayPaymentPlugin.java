@@ -130,10 +130,10 @@ public abstract class AbstractAlipayPaymentPlugin implements PaymentTransactionP
             log.debug("支付宝退款请求参数 {}", model);
         }
         req.setBizModel(model);
-        AssertUtils.hasLength(request.getRefundNotifyUrl(), "refund notify url mist not empty");
-        req.setNotifyUrl(request.getRefundNotifyUrl());
+        AssertUtils.hasLength(request.getAsynchronousNotificationUrl(), "refund notify url mist not empty");
+        req.setNotifyUrl(request.getAsynchronousNotificationUrl());
         if (log.isDebugEnabled()) {
-            log.debug("支付宝退款回调 URL ->[{}]", request.getRefundNotifyUrl());
+            log.debug("支付宝退款回调 URL ->[{}]", request.getAsynchronousNotificationUrl());
         }
 
         TransactionOrderRefundResponse result = new TransactionOrderRefundResponse();

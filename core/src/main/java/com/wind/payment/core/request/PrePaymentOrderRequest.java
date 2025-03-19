@@ -38,28 +38,16 @@ public class PrePaymentOrderRequest implements Serializable {
     private Integer orderAmount;
 
     /**
-     * 支付请求发起ip
+     * 同步通知(回调) url
      */
     @NotBlank
-    private String remoteIp;
-
+    private String synchronousCallbackUrl;
 
     /**
-     * 同步回调url
+     * 异步通知 url
      */
     @NotBlank
-    private String returnUrl;
-
-    /**
-     * 异步回调url
-     */
-    @NotBlank
-    private String notifyUrl;
-
-    /**
-     * 支付说明
-     */
-    private String description;
+    private String asynchronousNotificationUrl;
 
     /**
      * 交易结束时间
@@ -70,6 +58,16 @@ public class PrePaymentOrderRequest implements Serializable {
      */
     @NotBlank
     private String expireTime = "30m";
+
+    /**
+     * 支付说明
+     */
+    private String description;
+
+    /**
+     * 支付请求发起方 ip
+     */
+    private String requestSourceIp;
 
     /**
      * 商品展示 url
