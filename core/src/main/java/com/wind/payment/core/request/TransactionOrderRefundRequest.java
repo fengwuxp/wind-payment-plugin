@@ -1,5 +1,7 @@
 package com.wind.payment.core.request;
 
+import com.wind.transaction.core.Money;
+import com.wind.transaction.core.enums.CurrencyIsoCode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -46,7 +48,7 @@ public class TransactionOrderRefundRequest extends AbstractPaymentContextVariabl
      */
     @NotNull
     @Min(value = 1)
-    private Integer refundAmount;
+    private Money refundAmount;
 
     /**
      * 订单总金额
@@ -54,7 +56,7 @@ public class TransactionOrderRefundRequest extends AbstractPaymentContextVariabl
      */
     @NotNull
     @Min(value = 1)
-    private Integer orderAmount;
+    private Money orderAmount;
 
     /**
      * 退款异步通知 url

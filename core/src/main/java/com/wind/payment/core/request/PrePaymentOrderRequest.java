@@ -1,5 +1,7 @@
 package com.wind.payment.core.request;
 
+import com.wind.transaction.core.Money;
+import com.wind.transaction.core.enums.CurrencyIsoCode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -36,11 +38,11 @@ public class PrePaymentOrderRequest extends AbstractPaymentContextVariables impl
     private String userId;
 
     /**
-     * 支付金额，单位分
+     * 支付金额，单位：分
      */
     @NotNull
     @Min(value = 1)
-    private Integer orderAmount;
+    private Money orderAmount;
 
     /**
      * 同步通知(回调) url

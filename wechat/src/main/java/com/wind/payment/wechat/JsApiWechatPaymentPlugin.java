@@ -37,7 +37,7 @@ public class JsApiWechatPaymentPlugin extends AbstractWechatPaymentPlugin {
         req.setTradeType(WechatPayScene.JSAPI.name());
         req.setBody(normalizationBody(request.getDescription()));
         req.setOutTradeNo(request.getTransactionSn());
-        req.setTotalFee(request.getOrderAmount());
+        req.setTotalFee(request.getOrderAmount().getAmount());
         req.setSpbillCreateIp(request.getRequestSourceIp());
         req.setProductId(request.getTransactionSn());
         req.setTimeExpire(getExpireTimeOrUseDefault(request.getExpireTime()));
@@ -60,7 +60,8 @@ public class JsApiWechatPaymentPlugin extends AbstractWechatPaymentPlugin {
                     .setTransactionSn(request.getTransactionSn())
                     .setUseSandboxEnv(isUseSandboxEnv());
         } catch (WxPayException exception) {
-            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("微信 JsApi 支付交易异常，transactionNo = %s。", request.getTransactionSn()), exception);
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("微信 JsApi 支付交易异常，transactionNo = %s。",
+                    request.getTransactionSn()), exception);
         }
         return result;
     }

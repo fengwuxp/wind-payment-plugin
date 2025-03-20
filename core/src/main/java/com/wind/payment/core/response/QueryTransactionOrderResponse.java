@@ -1,6 +1,7 @@
 package com.wind.payment.core.response;
 
 import com.wind.payment.core.enums.PaymentTransactionState;
+import com.wind.transaction.core.Money;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -34,21 +35,21 @@ public class QueryTransactionOrderResponse implements Serializable {
      * 订单金额
      * 单位：分
      */
-    private Integer orderAmount;
+    private Money orderAmount;
 
     /**
      * 实付金额
      * 单位：分
      * 买家实际付款的金额
      */
-    private Integer buyerPayAmount;
+    private Money buyerPayAmount;
 
     /**
      * 实收金额
      * 单位分
      * 该金额为本笔交易，商户账户能够实际收到的金额
      */
-    private Integer receiptAmount;
+    private Money receiptAmount;
 
     /**
      * 是否沙箱环境

@@ -17,6 +17,10 @@
             <artifactId>wind-common</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.wind.integration</groupId>
+            <artifactId>wind-transaction-money</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
         </dependency>

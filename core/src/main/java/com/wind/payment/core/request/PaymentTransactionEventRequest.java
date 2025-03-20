@@ -1,5 +1,6 @@
 package com.wind.payment.core.request;
 
+import com.wind.transaction.core.Money;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -28,7 +29,7 @@ public class PaymentTransactionEventRequest implements Serializable {
      * 单位：分
      */
     @NotNull
-    private Integer orderAmount;
+    private Money orderAmount;
 
     /**
      * 原始的通知请求参数

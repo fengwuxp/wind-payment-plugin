@@ -10,7 +10,7 @@ import com.wind.payment.alipay.response.AliPayPageTransactionPayResult;
 import com.wind.payment.core.PaymentTransactionException;
 import com.wind.payment.core.request.PrePaymentOrderRequest;
 import com.wind.payment.core.response.PrePaymentOrderResponse;
-import com.wind.payment.core.util.PaymentTransactionUtils;
+import com.wind.transaction.core.enums.CurrencyIsoCode;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -45,7 +45,7 @@ public class WebPageAlipayPaymentPlugin extends AbstractAlipayPaymentPlugin {
         model.setBody(normalizationBody(request.getDescription()));
         model.setTimeExpire(getExpireTimeOrUseDefault(request.getExpireTime()));
         model.setSubject(request.getSubject());
-        model.setTotalAmount(PaymentTransactionUtils.feeToYun(request.getOrderAmount()).toString());
+        model.setTotalAmount(request.getOrderAmount().fen2Yuan().toString());
         req.setBizModel(model);
         req.setNotifyUrl(request.getAsynchronousNotificationUrl());
         req.setReturnUrl(request.getSynchronousCallbackUrl());
@@ -69,7 +69,7 @@ public class WebPageAlipayPaymentPlugin extends AbstractAlipayPaymentPlugin {
                 result.setTransactionSn(response.getOutTradeNo())
                         .setOutTransactionSn(response.getTradeNo())
                         .setUseSandboxEnv(this.isUseSandboxEnv())
-                        .setOrderAmount(PaymentTransactionUtils.yuanToFee(response.getTotalAmount()))
+                        .setOrderAmount(CurrencyIsoCode.CNY.ofText(response.getTotalAmount()))
                         .setResult(tradePayResult)
                         .setRawResponse(response);
             } else {
@@ -77,7 +77,8 @@ public class WebPageAlipayPaymentPlugin extends AbstractAlipayPaymentPlugin {
                         ERROR_PATTERN, request.getTransactionSn(), response.getCode(), response.getMsg()));
             }
         } catch (AlipayApiException exception) {
-            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("支付宝电脑网站支付交易异常，transactionNo = %s。", request.getTransactionSn()), exception);
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("支付宝电脑网站支付交易异常，transactionNo = %s。",
+                    request.getTransactionSn()), exception);
         }
 
         return result;

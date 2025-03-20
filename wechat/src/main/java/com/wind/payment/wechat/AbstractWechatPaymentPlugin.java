@@ -21,12 +21,13 @@ import com.wind.payment.core.PaymentTransactionException;
 import com.wind.payment.core.PaymentTransactionPlugin;
 import com.wind.payment.core.enums.PaymentTransactionState;
 import com.wind.payment.core.request.PaymentTransactionEventRequest;
-import com.wind.payment.core.request.PaymentTransactionRefundNoticeRequest;
+import com.wind.payment.core.request.PaymentTransactionRefundEventRequest;
 import com.wind.payment.core.request.QueryTransactionOrderRefundRequest;
 import com.wind.payment.core.request.QueryTransactionOrderRequest;
 import com.wind.payment.core.request.TransactionOrderRefundRequest;
 import com.wind.payment.core.response.QueryTransactionOrderResponse;
 import com.wind.payment.core.response.TransactionOrderRefundResponse;
+import com.wind.transaction.core.enums.CurrencyIsoCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -118,9 +119,9 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
             QueryTransactionOrderResponse result = new QueryTransactionOrderResponse();
             return result.setOutTransactionSn(response.getTransactionId())
                     .setOutTransactionSn(response.getOutTradeNo())
-                    .setOrderAmount(response.getTotalFee())
-                    .setBuyerPayAmount(response.getSettlementTotalFee())
-                    .setReceiptAmount(response.getSettlementTotalFee())
+                    .setOrderAmount(CurrencyIsoCode.CNY.of(response.getTotalFee()))
+                    .setBuyerPayAmount(CurrencyIsoCode.CNY.of(response.getSettlementTotalFee()))
+                    .setReceiptAmount(CurrencyIsoCode.CNY.of(response.getSettlementTotalFee()))
                     .setTransactionState(this.transformTradeState(response.getTradeState()))
                     .setUseSandboxEnv(isUseSandboxEnv())
                     .setRawResponse(response);
@@ -133,11 +134,11 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
     @Override
     public TransactionOrderRefundResponse transactionOrderRefund(TransactionOrderRefundRequest request) {
         WxPayRefundRequest req = new WxPayRefundRequest();
-        req.setRefundFee(request.getRefundAmount());
+        req.setRefundFee(request.getRefundAmount().getAmount());
         req.setTransactionId(request.getOutTransactionSn());
         req.setOutTradeNo(request.getTransactionSn());
         req.setOutRefundNo(request.getTransactionRefundSn());
-        req.setTotalFee(request.getOrderAmount());
+        req.setTotalFee(request.getOrderAmount().getAmount());
         req.setNotifyUrl(request.getAsynchronousNotificationUrl());
         req.setRefundDesc(request.getRefundReason());
         try {
@@ -149,8 +150,8 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
             return result.setTransactionSn(request.getTransactionSn())
                     .setTransactionRefundSn(response.getOutRefundNo())
                     .setOutTransactionRefundSn(response.getRefundId())
-                    .setRefundAmount(response.getRefundFee())
-                    .setOrderAmount(response.getTotalFee())
+                    .setRefundAmount(CurrencyIsoCode.CNY.of(response.getRefundFee()))
+                    .setOrderAmount(CurrencyIsoCode.CNY.of(response.getTotalFee()))
                     .setTransactionState(PaymentTransactionState.WAIT_REFUND)
                     .setRawResponse(response);
         } catch (WxPayException exception) {
@@ -178,8 +179,8 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
             return result.setTransactionSn(request.getTransactionSn())
                     .setTransactionRefundSn(refundRecord.getOutRefundNo())
                     .setOutTransactionRefundSn(refundRecord.getOutRefundNo())
-                    .setRefundAmount(refundRecord.getSettlementRefundFee())
-                    .setOrderAmount(response.getTotalFee())
+                    .setRefundAmount(CurrencyIsoCode.CNY.of(refundRecord.getSettlementRefundFee()))
+                    .setOrderAmount(CurrencyIsoCode.CNY.of(response.getTotalFee()))
                     .setTransactionState(transformTradeState(refundRecord.getRefundStatus()))
                     .setRawResponse(response);
         } catch (WxPayException exception) {
@@ -189,13 +190,13 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
     }
 
     @Override
-    public QueryTransactionOrderResponse paymentEvent(PaymentTransactionEventRequest request) {
+    public QueryTransactionOrderResponse onPaymentEvent(PaymentTransactionEventRequest request) {
         WxPayOrderNotifyResult notifyResult = verifyPaymentNotifyRequest(request);
         QueryTransactionOrderResponse result = new QueryTransactionOrderResponse();
         result.setOutTransactionSn(notifyResult.getTransactionId())
                 .setTransactionSn(notifyResult.getOutTradeNo())
-                .setOrderAmount(notifyResult.getTotalFee())
-                .setBuyerPayAmount(notifyResult.getSettlementTotalFee())
+                .setOrderAmount(CurrencyIsoCode.CNY.of(notifyResult.getTotalFee()))
+                .setBuyerPayAmount(CurrencyIsoCode.CNY.of(notifyResult.getSettlementTotalFee()))
                 .setUseSandboxEnv(isUseSandboxEnv());
         if (isSuccessful(notifyResult.getReturnCode(), notifyResult.getResultCode())) {
             result.setTransactionState(PaymentTransactionState.COMPLETED);
@@ -207,15 +208,15 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
     }
 
     @Override
-    public TransactionOrderRefundResponse refundEvent(PaymentTransactionRefundNoticeRequest request) {
+    public TransactionOrderRefundResponse onRefundEvent(PaymentTransactionRefundEventRequest request) {
         // 验签
         WxPayRefundNotifyResult notifyResult = verifyRefundNotifyRequest(request);
         WxPayRefundNotifyResult.ReqInfo reqInfo = notifyResult.getReqInfo();
         TransactionOrderRefundResponse result = new TransactionOrderRefundResponse();
         result.setTransactionRefundSn(reqInfo.getOutRefundNo())
                 .setOutTransactionRefundSn(reqInfo.getRefundId())
-                .setOrderAmount(reqInfo.getTotalFee())
-                .setRefundAmount(reqInfo.getSettlementRefundFee())
+                .setOrderAmount(CurrencyIsoCode.CNY.of(reqInfo.getTotalFee()))
+                .setRefundAmount(CurrencyIsoCode.CNY.of(reqInfo.getSettlementRefundFee()))
                 .setRawResponse(notifyResult);
         if (isSuccessful(notifyResult.getReturnCode(), notifyResult.getResultCode())) {
             result.setTransactionState(Objects.equals(result.getOrderAmount(), result.getRefundAmount()) ? PaymentTransactionState.REFUNDED :
@@ -299,7 +300,7 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
      * @param request 通知请求
      * @return WxPayRefundNotifyResult
      */
-    private WxPayRefundNotifyResult verifyRefundNotifyRequest(PaymentTransactionRefundNoticeRequest request) {
+    private WxPayRefundNotifyResult verifyRefundNotifyRequest(PaymentTransactionRefundEventRequest request) {
         try {
             WxPayRefundNotifyResult notifyResult = wxPayService.parseRefundNotifyResult(request.getRawRequest());
             boolean verifyResult = Objects.equals(config.getPartner(), notifyResult.getMchId())

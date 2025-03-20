@@ -36,7 +36,7 @@ public class ScanWechatPaymentPlugin extends AbstractWechatPaymentPlugin {
         req.setTradeType(WechatPayScene.NATIVE.name());
         req.setBody(normalizationBody(request.getDescription()));
         req.setOutTradeNo(request.getTransactionSn());
-        req.setTotalFee(request.getOrderAmount());
+        req.setTotalFee(request.getOrderAmount().getAmount());
         req.setSpbillCreateIp(request.getRequestSourceIp());
         req.setProductId(request.getTransactionSn());
         req.setTimeExpire(getExpireTimeOrUseDefault(request.getExpireTime()));
@@ -51,7 +51,8 @@ public class ScanWechatPaymentPlugin extends AbstractWechatPaymentPlugin {
                     .setUseSandboxEnv(isUseSandboxEnv())
                     .setRawResponse(orderResult);
         } catch (WxPayException exception) {
-            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("微信扫码支付交易异常，transactionNo = %s。", request.getTransactionSn()), exception);
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("微信扫码支付交易异常，transactionNo = %s。",
+                    request.getTransactionSn()), exception);
         }
         return result;
     }

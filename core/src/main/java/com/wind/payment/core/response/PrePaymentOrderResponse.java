@@ -1,5 +1,6 @@
 package com.wind.payment.core.response;
 
+import com.wind.transaction.core.Money;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -34,7 +35,7 @@ public class PrePaymentOrderResponse implements Serializable {
      * 订单金额
      * 单位分
      */
-    private Integer orderAmount;
+    private Money orderAmount;
 
     /**
      * 是否沙箱环境

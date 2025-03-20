@@ -1,6 +1,7 @@
 package com.wind.payment.core.response;
 
 import com.wind.payment.core.enums.PaymentTransactionState;
+import com.wind.transaction.core.Money;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -28,13 +29,13 @@ public class TransactionOrderRefundResponse implements Serializable {
      * 退款的金额
      * 单位：分
      */
-    private Integer refundAmount;
+    private Money refundAmount;
 
     /**
      * 订单金额
      * 单位：分
      */
-    private Integer orderAmount;
+    private Money orderAmount;
 
     /**
      * 应用内的交易流水号

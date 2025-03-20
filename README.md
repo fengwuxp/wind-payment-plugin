@@ -1,2 +1,1 @@
-
 # Wind-Payment-Plugin

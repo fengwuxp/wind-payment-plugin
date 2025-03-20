@@ -1,5 +1,6 @@
 package com.wind.payment.core.request;
 
+import com.wind.transaction.core.Money;
 import lombok.Data;
 
 import javax.validation.constraints.Min;
@@ -14,7 +15,7 @@ import java.io.Serializable;
  * @date 2023-10-01 13:43
  **/
 @Data
-public class PaymentTransactionRefundNoticeRequest implements Serializable {
+public class PaymentTransactionRefundEventRequest implements Serializable {
 
     private static final long serialVersionUID = 7026788394092470016L;
 
@@ -29,7 +30,7 @@ public class PaymentTransactionRefundNoticeRequest implements Serializable {
      * 单位：分
      */
     @NotNull
-    private Integer orderAmount;
+    private Money orderAmount;
 
     /**
      * 退款金额
@@ -37,7 +38,7 @@ public class PaymentTransactionRefundNoticeRequest implements Serializable {
      */
     @NotNull
     @Min(value = 1)
-    private Integer refundAmount;
+    private Money refundAmount;
 
     /**
      * 原始的通知请求参数

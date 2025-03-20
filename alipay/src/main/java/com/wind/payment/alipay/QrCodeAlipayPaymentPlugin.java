@@ -10,7 +10,7 @@ import com.wind.payment.alipay.response.AliPayQrCodeTransactionPayResult;
 import com.wind.payment.core.PaymentTransactionException;
 import com.wind.payment.core.request.PrePaymentOrderRequest;
 import com.wind.payment.core.response.PrePaymentOrderResponse;
-import com.wind.payment.core.util.PaymentTransactionUtils;
+import com.wind.transaction.core.enums.CurrencyIsoCode;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -39,7 +39,7 @@ public class QrCodeAlipayPaymentPlugin extends AbstractAlipayPaymentPlugin {
         model.setBody(normalizationBody(request.getDescription()));
         model.setTimeExpire(getExpireTimeOrUseDefault(request.getExpireTime()));
         model.setSubject(request.getSubject());
-        model.setTotalAmount(PaymentTransactionUtils.feeToYun(request.getOrderAmount()).toString());
+        model.setTotalAmount(request.getOrderAmount().fen2Yuan().toString());
         req.setBizModel(model);
         req.setNotifyUrl(request.getAsynchronousNotificationUrl());
         req.setReturnUrl(request.getSynchronousCallbackUrl());
@@ -65,7 +65,8 @@ public class QrCodeAlipayPaymentPlugin extends AbstractAlipayPaymentPlugin {
             }
 
         } catch (AlipayApiException exception) {
-            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("支付宝二维码支付交易异常，transactionNo = %s。", request.getTransactionSn()), exception);
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("支付宝二维码支付交易异常，transactionNo = %s。",
+                    request.getTransactionSn()), exception);
         }
 
         return result;

@@ -24,7 +24,8 @@ public class DefaultPaymentTransactionPluginFactory implements PaymentTransactio
     @Override
     public PaymentTransactionPlugin factory(String partnerId, PaymentTransactionPlatform platform, PaymentTransactionScene scene) {
         Class<? extends PaymentTransactionPlugin> classType = PLUGINS.get(getPluginCacheKey(platform, scene));
-        AssertUtils.notNull(classType, String.format("not found platform = %s scene = %s payment transaction plugin", platform.getDesc(), scene.getDesc()));
+        AssertUtils.notNull(classType, String.format("not found platform = %s scene = %s payment transaction plugin", platform.getDesc(),
+                scene.getDesc()));
         String config = partnerConfigProvider.apply(partnerId);
         return buildPaymentTransactionPlugin(classType, config);
     }
@@ -45,7 +46,8 @@ public class DefaultPaymentTransactionPluginFactory implements PaymentTransactio
      * @param scene           支付场景
      * @param pluginClassType 支付插件实现类
      */
-    public static void register(PaymentTransactionPlatform platform, PaymentTransactionScene scene, Class<? extends PaymentTransactionPlugin> pluginClassType) {
+    public static void register(PaymentTransactionPlatform platform, PaymentTransactionScene scene,
+                                Class<? extends PaymentTransactionPlugin> pluginClassType) {
         PLUGINS.put(getPluginCacheKey(platform, scene), pluginClassType);
     }
 
