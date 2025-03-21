@@ -4,11 +4,11 @@ import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
 import lombok.AllArgsConstructor;
+import org.springframework.util.ConcurrentReferenceHashMap;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Constructor;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author wuxp
@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @AllArgsConstructor
 public class DefaultPaymentTransactionPluginFactory implements PaymentTransactionPluginFactory {
 
-    private static final Map<String, Class<? extends PaymentTransactionPlugin>> PLUGINS = new ConcurrentHashMap<>();
+    private static final Map<String, Class<? extends PaymentTransactionPlugin>> PLUGINS = new ConcurrentReferenceHashMap<>();
 
     private final PartnerConfigProvider partnerConfigProvider;
 
