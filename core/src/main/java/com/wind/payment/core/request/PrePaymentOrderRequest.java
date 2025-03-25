@@ -1,7 +1,6 @@
 package com.wind.payment.core.request;
 
 import com.wind.transaction.core.Money;
-import com.wind.transaction.core.enums.CurrencyIsoCode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -60,8 +59,8 @@ public class PrePaymentOrderRequest extends AbstractPaymentContextVariables impl
      * 订单有效期
      * 默认：15 分钟
      */
-    @NotBlank
-    private Duration expireTime = Duration.ofMinutes(15);
+    @NotNull
+    private Duration validityDuration = Duration.ofMinutes(15);
 
     /**
      * 支付说明

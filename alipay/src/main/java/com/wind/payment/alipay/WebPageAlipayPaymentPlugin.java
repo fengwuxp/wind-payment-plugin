@@ -43,7 +43,7 @@ public class WebPageAlipayPaymentPlugin extends AbstractAlipayPaymentPlugin {
         model.setProductCode(ALI_WEB_PAGE_PAY_PRODUCT_CODE);
         model.setOutTradeNo(request.getTransactionSn());
         model.setBody(normalizationBody(request.getDescription()));
-        model.setTimeExpire(getExpireTimeOrUseDefault(request.getExpireTime()));
+        model.setTimeExpire(getExpireTimeOrUseDefault(request.getValidityDuration()));
         model.setSubject(request.getSubject());
         model.setTotalAmount(request.getOrderAmount().fen2Yuan().toString());
         req.setBizModel(model);

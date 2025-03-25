@@ -43,7 +43,7 @@ public class AuthCodeAlipayPaymentPlugin extends AbstractAlipayPaymentPlugin {
         AlipayTradePayModel model = new AlipayTradePayModel();
         model.setProductCode(ALI_FACE_PAY_PRODUCT_CODE);
         model.setBody(normalizationBody(request.getDescription()));
-        model.setTimeExpire(getExpireTimeOrUseDefault(request.getExpireTime()));
+        model.setTimeExpire(getExpireTimeOrUseDefault(request.getValidityDuration()));
         model.setSubject(request.getSubject());
         model.setTotalAmount(request.getOrderAmount().fen2Yuan().toString());
         model.setOutTradeNo(request.getTransactionSn());

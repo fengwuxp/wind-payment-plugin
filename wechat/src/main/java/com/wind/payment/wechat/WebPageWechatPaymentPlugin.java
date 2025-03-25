@@ -39,7 +39,7 @@ public class WebPageWechatPaymentPlugin extends AbstractWechatPaymentPlugin {
         req.setTotalFee(request.getOrderAmount().getAmount());
         req.setSpbillCreateIp(request.getRequestSourceIp());
         req.setProductId(request.getTransactionSn());
-        req.setTimeExpire(getExpireTimeOrUseDefault(request.getExpireTime()));
+        req.setTimeExpire(getExpireTimeOrUseDefault(request.getValidityDuration()));
         req.setSceneInfo(request.getSceneInfo());
         try {
             WxPayMwebOrderResult orderResult = getWxPayService().createOrder(req);

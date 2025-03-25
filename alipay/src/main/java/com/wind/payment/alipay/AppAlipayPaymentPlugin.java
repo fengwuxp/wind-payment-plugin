@@ -9,7 +9,6 @@ import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.payment.core.PaymentTransactionException;
 import com.wind.payment.core.request.PrePaymentOrderRequest;
 import com.wind.payment.core.response.PrePaymentOrderResponse;
-import com.wind.transaction.core.enums.CurrencyIsoCode;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -42,7 +41,7 @@ public class AppAlipayPaymentPlugin extends AbstractAlipayPaymentPlugin {
         model.setProductCode(ALI_APP_PAY_PRODUCT_CODE);
         model.setOutTradeNo(request.getTransactionSn());
         model.setBody(normalizationBody(request.getDescription()));
-        model.setTimeExpire(getExpireTimeOrUseDefault(request.getExpireTime()));
+        model.setTimeExpire(getExpireTimeOrUseDefault(request.getValidityDuration()));
         model.setSubject(request.getSubject());
         model.setTotalAmount(request.getOrderAmount().fen2Yuan().toString());
         req.setBizModel(model);
