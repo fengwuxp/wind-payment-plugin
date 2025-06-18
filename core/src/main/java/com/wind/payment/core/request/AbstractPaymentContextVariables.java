@@ -2,7 +2,7 @@ package com.wind.payment.core.request;
 
 import com.wind.core.WritableContextVariables;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
