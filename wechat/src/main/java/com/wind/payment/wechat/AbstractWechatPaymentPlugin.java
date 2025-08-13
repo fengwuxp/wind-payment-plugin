@@ -134,11 +134,11 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
     @Override
     public TransactionOrderRefundResponse transactionOrderRefund(TransactionOrderRefundRequest request) {
         WxPayRefundRequest req = new WxPayRefundRequest();
-        req.setRefundFee(request.getRefundAmount().getAmount());
+        req.setRefundFee(request.getRefundAmount().getIntAmount());
         req.setTransactionId(request.getOutTransactionSn());
         req.setOutTradeNo(request.getTransactionSn());
         req.setOutRefundNo(request.getTransactionRefundSn());
-        req.setTotalFee(request.getOrderAmount().getAmount());
+        req.setTotalFee(request.getOrderAmount().getIntAmount());
         req.setNotifyUrl(request.getAsynchronousNotificationUrl());
         req.setRefundDesc(request.getRefundReason());
         try {

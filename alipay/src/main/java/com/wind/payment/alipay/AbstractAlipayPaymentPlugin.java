@@ -112,7 +112,7 @@ public abstract class AbstractAlipayPaymentPlugin implements PaymentTransactionP
                         .setBuyerPayAmount(buyerPayAmount)
                         .setReceiptAmount(CurrencyIsoCode.CNY.ofText(response.getReceiptAmount()))
                         .setUseSandboxEnv(this.isUseSandboxEnv())
-                        .setTransactionState(this.transformTradeState(response.getTradeStatus(), buyerPayAmount.getAmount()))
+                        .setTransactionState(this.transformTradeState(response.getTradeStatus(), buyerPayAmount.getIntAmount()))
                         .setRawResponse(response);
             } else {
                 throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("查询支付宝交易单失败，transactionNo = %s。" +
@@ -224,7 +224,7 @@ public abstract class AbstractAlipayPaymentPlugin implements PaymentTransactionP
         } else {
             buyerPayAmount = CurrencyIsoCode.CNY.of(payAmount);
         }
-        result.setTransactionState(this.transformTradeState(tradeState.name(), buyerPayAmount.getAmount()))
+        result.setTransactionState(this.transformTradeState(tradeState.name(), buyerPayAmount.getIntAmount()))
                 .setBuyerPayAmount(buyerPayAmount)
                 .setUseSandboxEnv(this.isUseSandboxEnv())
                 .setPayerAccount(noticeRequest.getBuyer_logon_id())
