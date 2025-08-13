@@ -37,7 +37,7 @@ public class AppWechatPaymentPlugin extends AbstractWechatPaymentPlugin {
         req.setTradeType(WechatPayScene.APP.name());
         req.setBody(normalizationBody(request.getDescription()));
         req.setOutTradeNo(request.getTransactionSn());
-        req.setTotalFee(request.getOrderAmount().getAmount());
+        req.setTotalFee(request.getOrderAmount().getIntAmount());
         req.setSpbillCreateIp(request.getRequestSourceIp());
         req.setProductId(request.getTransactionSn());
         req.setTimeExpire(getExpireTimeOrUseDefault(request.getValidityDuration()));
