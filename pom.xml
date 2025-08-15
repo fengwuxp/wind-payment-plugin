@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.wind.middleware</groupId>
         <artifactId>wind-middleware</artifactId>
-        <version>1.0.0-jdk21-SNAPSHOT</version>
+        <version>1.0.1-jdk21-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
@@ -23,7 +23,7 @@
     </modules>
 
     <properties>
-        <revision>1.0.0-jdk21-SNAPSHOT</revision>
+        <revision>1.0.1-jdk21-SNAPSHOT</revision>
         <alipay-sdk.version>4.38.90.ALL</alipay-sdk.version>
         <weixin-java-pay.version>4.5.0</weixin-java-pay.version>
     </properties>
