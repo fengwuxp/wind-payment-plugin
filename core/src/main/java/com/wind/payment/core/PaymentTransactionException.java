@@ -4,6 +4,8 @@ import com.wind.common.exception.BaseException;
 import com.wind.common.exception.ExceptionCode;
 import lombok.Getter;
 
+import java.io.Serial;
+
 /**
  * 交易相关异常
  *
@@ -13,6 +15,7 @@ import lombok.Getter;
 @Getter
 public class PaymentTransactionException extends BaseException {
 
+    @Serial
     private static final long serialVersionUID = 3450136622980599458L;
 
     private final String requestId;

@@ -17,7 +17,7 @@ import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.DefaultExceptionCode;
-import com.wind.payment.alipay.notification.AlipayAsyncNotificationRequest;
+import com.wind.payment.alipay.webhook.AlipayAsyncNotificationRequest;
 import com.wind.payment.core.PaymentTransactionException;
 import com.wind.payment.core.PaymentTransactionPlugin;
 import com.wind.payment.core.enums.PaymentTransactionState;

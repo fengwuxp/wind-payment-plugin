@@ -14,6 +14,7 @@ import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.service.impl.WxPayServiceImpl;
 import com.wind.common.WindConstants;
+import com.wind.common.WindDateFormatPatterns;
 import com.wind.common.enums.DescriptiveEnum;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.DefaultExceptionCode;
@@ -28,13 +29,13 @@ import com.wind.payment.core.request.TransactionOrderRefundRequest;
 import com.wind.payment.core.response.QueryTransactionOrderResponse;
 import com.wind.payment.core.response.TransactionOrderRefundResponse;
 import com.wind.transaction.core.enums.CurrencyIsoCode;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
-import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Date;
@@ -61,8 +62,6 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
     private static final String PAYMENT_RESULT_HANDLE_FAILURE_RETURN_CONTENT = WxPayNotifyResponse.success("failure");
 
     private static final List<String> SUCCESS_CODES = Arrays.asList(WxPayConstants.ResultCode.SUCCESS, WindConstants.EMPTY);
-
-    private static final String DATE_FORMAT_PATTERN = "yyyyMMddHHmmss";
 
     /**
      * SUCCESS -—支付成功,
@@ -349,6 +348,6 @@ public abstract class AbstractWechatPaymentPlugin implements PaymentTransactionP
         if (expireTime == null) {
             expireTime = Duration.ofMinutes(30);
         }
-        return DateFormatUtils.format(new Date(System.currentTimeMillis() + expireTime.toMillis()), DATE_FORMAT_PATTERN);
+        return DateFormatUtils.format(new Date(System.currentTimeMillis() + expireTime.toMillis()), WindDateFormatPatterns.YYYYMMDDHHMMSS);
     }
 }

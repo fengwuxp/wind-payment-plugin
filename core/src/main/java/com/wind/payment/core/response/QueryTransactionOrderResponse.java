@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import jakarta.validation.constraints.NotNull;
+
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -18,6 +20,7 @@ import java.io.Serializable;
 @Accessors(chain = true)
 public class QueryTransactionOrderResponse implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -749648626405632029L;
 
     /**

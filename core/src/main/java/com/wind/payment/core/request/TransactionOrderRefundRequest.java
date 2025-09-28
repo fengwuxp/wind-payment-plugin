@@ -1,14 +1,14 @@
 package com.wind.payment.core.request;
 
 import com.wind.transaction.core.Money;
-import com.wind.transaction.core.enums.CurrencyIsoCode;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -22,6 +22,7 @@ import java.io.Serializable;
 @ToString(callSuper = true)
 public class TransactionOrderRefundRequest extends AbstractPaymentContextVariables implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 8514897252783130486L;
 
     /**

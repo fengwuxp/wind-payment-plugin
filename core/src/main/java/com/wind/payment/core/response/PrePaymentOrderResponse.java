@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import jakarta.validation.constraints.NotNull;
+
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -15,6 +17,7 @@ import java.io.Serializable;
 @Accessors(chain = true)
 public class PrePaymentOrderResponse implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -6545970091470284620L;
 
     /**

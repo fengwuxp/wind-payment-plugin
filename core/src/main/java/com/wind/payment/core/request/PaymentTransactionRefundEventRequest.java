@@ -6,6 +6,8 @@ import lombok.Data;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -17,6 +19,7 @@ import java.io.Serializable;
 @Data
 public class PaymentTransactionRefundEventRequest implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 7026788394092470016L;
 
     /**

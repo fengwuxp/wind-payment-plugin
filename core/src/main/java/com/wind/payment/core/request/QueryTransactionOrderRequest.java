@@ -3,6 +3,8 @@ package com.wind.payment.core.request;
 import lombok.Data;
 
 import jakarta.validation.constraints.NotBlank;
+
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -14,6 +16,7 @@ import java.io.Serializable;
 @Data
 public class QueryTransactionOrderRequest implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -4921074854542888262L;
 
     /**

@@ -8,6 +8,8 @@ import lombok.ToString;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Duration;
 
@@ -22,6 +24,7 @@ import java.time.Duration;
 @ToString(callSuper = true)
 public class PrePaymentOrderRequest extends AbstractPaymentContextVariables implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 6802966138298876457L;
 
     /**

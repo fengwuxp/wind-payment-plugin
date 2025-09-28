@@ -16,7 +16,7 @@ public abstract class AbstractPaymentContextVariables implements WritableContext
     /**
      * 上下文变量
      */
-    private Map<String, Object> contextVariables = new HashMap<>();
+    private final Map<String, Object> contextVariables = new HashMap<>();
 
     @Override
     public WritableContextVariables putVariable(@NotBlank String name, Object val) {

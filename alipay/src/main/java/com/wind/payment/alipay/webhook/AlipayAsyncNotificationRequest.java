@@ -1,4 +1,4 @@
-package com.wind.payment.alipay.notification;
+package com.wind.payment.alipay.webhook;
 
 import com.wind.payment.alipay.AliPayPartnerConfig;
 import com.wind.payment.alipay.AliPayTransactionState;
