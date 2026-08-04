@@ -1,11 +1,11 @@
 package com.wind.payment.alipay;
 
-import com.alibaba.fastjson2.JSON;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.domain.AlipayTradeAppPayModel;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.wind.common.exception.DefaultExceptionCode;
+import com.wind.jackson.WindJson;
 import com.wind.payment.core.PaymentTransactionException;
 import com.wind.payment.core.request.PrePaymentOrderRequest;
 import com.wind.payment.core.response.PrePaymentOrderResponse;
@@ -27,7 +27,7 @@ public class AppAlipayPaymentPlugin extends AbstractAlipayPaymentPlugin {
     private static final String ALI_APP_PAY_PRODUCT_CODE = "QUICK_MSECURITY_PAY";
 
     public AppAlipayPaymentPlugin(String config) {
-        this(JSON.parseObject(config, AliPayPartnerConfig.class));
+        this(WindJson.parseObject(config, AliPayPartnerConfig.class));
     }
 
     public AppAlipayPaymentPlugin(AliPayPartnerConfig config) {

@@ -1,10 +1,10 @@
 package com.wind.payment.wechat;
 
-import com.alibaba.fastjson2.JSON;
 import com.github.binarywang.wxpay.bean.order.WxPayAppOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.wind.common.exception.DefaultExceptionCode;
+import com.wind.jackson.WindJson;
 import com.wind.payment.core.PaymentTransactionException;
 import com.wind.payment.core.request.PrePaymentOrderRequest;
 import com.wind.payment.core.response.PrePaymentOrderResponse;
@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AppWechatPaymentPlugin extends AbstractWechatPaymentPlugin {
 
     public AppWechatPaymentPlugin(String config) {
-        super(JSON.parseObject(config, WechatPayPartnerConfig.class));
+        super(WindJson.parseObject(config, WechatPayPartnerConfig.class));
     }
 
     public AppWechatPaymentPlugin(WechatPayPartnerConfig config) {

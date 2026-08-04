@@ -1,7 +1,5 @@
 package com.wind.payment.alipay;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.TypeReference;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
@@ -17,7 +15,6 @@ import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.DefaultExceptionCode;
-import com.wind.payment.alipay.webhook.AlipayAsyncNotificationRequest;
 import com.wind.payment.core.PaymentTransactionException;
 import com.wind.payment.core.PaymentTransactionPlugin;
 import com.wind.payment.core.enums.PaymentTransactionState;
@@ -210,43 +207,43 @@ public abstract class AbstractAlipayPaymentPlugin implements PaymentTransactionP
 
     @Override
     public QueryTransactionOrderResponse onPaymentEvent(PaymentTransactionEventRequest request) {
-        verifyPaymentNotifyRequest(request);
+        Map<String, String> noticeRequest = getNotificationParams(request.getRawRequest());
+        verifyPaymentNotifyRequest(request, noticeRequest);
         QueryTransactionOrderResponse result = new QueryTransactionOrderResponse();
-        AlipayAsyncNotificationRequest noticeRequest = request.getRawRequest();
-        result.setOutTransactionSn(noticeRequest.getTrade_no())
-                .setTransactionSn(noticeRequest.getOut_trade_no())
-                .setOrderAmount(CurrencyIsoCode.CNY.of(noticeRequest.getTotal_amount()));
-        AliPayTransactionState tradeState = noticeRequest.getTrade_status();
+        result.setOutTransactionSn(noticeRequest.get("trade_no"))
+                .setTransactionSn(noticeRequest.get("out_trade_no"))
+                .setOrderAmount(CurrencyIsoCode.CNY.of(parseAmount(noticeRequest, "total_amount")));
         Money buyerPayAmount;
-        BigDecimal payAmount = noticeRequest.getBuyer_pay_amount();
-        if (payAmount == null) {
+        String payAmount = noticeRequest.get("buyer_pay_amount");
+        if (StringUtils.isBlank(payAmount)) {
             buyerPayAmount = request.getOrderAmount();
         } else {
-            buyerPayAmount = CurrencyIsoCode.CNY.of(payAmount);
+            buyerPayAmount = CurrencyIsoCode.CNY.of(parseAmount(noticeRequest, "buyer_pay_amount"));
         }
-        result.setTransactionState(this.transformTradeState(tradeState.name(), buyerPayAmount.getIntAmount()))
+        result.setTransactionState(this.transformTradeState(noticeRequest.get("trade_status"), buyerPayAmount.getIntAmount()))
                 .setBuyerPayAmount(buyerPayAmount)
                 .setUseSandboxEnv(this.isUseSandboxEnv())
-                .setPayerAccount(noticeRequest.getBuyer_logon_id())
+                .setPayerAccount(noticeRequest.get("buyer_logon_id"))
                 .setRawResponse(noticeRequest);
-        BigDecimal receiptAmount = noticeRequest.getReceipt_amount();
-        if (receiptAmount != null) {
+        String receiptAmount = noticeRequest.get("receipt_amount");
+        if (StringUtils.isNotBlank(receiptAmount)) {
             // TODO 实收金额验证
-            result.setReceiptAmount(CurrencyIsoCode.CNY.of(receiptAmount));
+            result.setReceiptAmount(CurrencyIsoCode.CNY.of(parseAmount(noticeRequest, "receipt_amount")));
         }
         return result;
     }
 
     @Override
     public TransactionOrderRefundResponse onRefundEvent(PaymentTransactionRefundEventRequest request) {
-        verifyRefundNotifyRequest(request);
+        Map<String, String> noticeRequest = getNotificationParams(request.getRawRequest());
+        verifyRefundNotifyRequest(request, noticeRequest);
         // 退款处理订单通知
         TransactionOrderRefundResponse result = new TransactionOrderRefundResponse();
-        AlipayAsyncNotificationRequest noticeRequest = request.getRawRequest();
         result.setTransactionRefundSn(request.getTransactionRefundSn());
-        result.setOutTransactionRefundSn(noticeRequest.getOut_biz_no());
-        result.setOrderAmount(CurrencyIsoCode.CNY.of(noticeRequest.getTotal_amount()));
-        result.setRefundAmount(CurrencyIsoCode.CNY.of(noticeRequest.getRefund_fee()));
+        result.setOutTransactionRefundSn(noticeRequest.get("out_biz_no"));
+        result.setOrderAmount(CurrencyIsoCode.CNY.of(parseAmount(noticeRequest, "total_amount")));
+        result.setRefundAmount(CurrencyIsoCode.CNY.of(parseAmount(noticeRequest, "refund_fee")));
+        result.setRawResponse(noticeRequest);
         return result;
     }
 
@@ -295,51 +292,39 @@ public abstract class AbstractAlipayPaymentPlugin implements PaymentTransactionP
     /**
      * 验证支付宝支付通知请求
      */
-    private void verifyPaymentNotifyRequest(PaymentTransactionEventRequest request) {
-        // 参数验证
+    private void verifyPaymentNotifyRequest(PaymentTransactionEventRequest request, Map<String, String> params) {
+        verifySign(params);
         String tradeNo = request.getTransactionSn();
-        AlipayAsyncNotificationRequest rawRequest = request.getRawRequest();
         BigDecimal orderAmount = request.getOrderAmount().fen2Yuan();
-        boolean paramVerify = Objects.equals(tradeNo, rawRequest.getOut_trade_no())
-                && Objects.equals(orderAmount, rawRequest.getTotal_amount());
-        AssertUtils.isTrue(paramVerify, () -> String.format("支付宝支付通知，【%s】参数验证失:%s", tradeNo, rawRequest));
-        verifySign(rawRequest);
+        boolean paramVerify = Objects.equals(tradeNo, params.get("out_trade_no"))
+                && orderAmount.compareTo(parseAmount(params, "total_amount")) == 0;
+        AssertUtils.isTrue(paramVerify, () -> String.format("支付宝支付通知，【%s】参数验证失败:%s", tradeNo, params));
     }
 
 
     /**
      * 验证支付宝退款通知请求
      */
-    private void verifyRefundNotifyRequest(PaymentTransactionRefundEventRequest request) {
-        // 参数验证
-        Map<String, String> params = request.getRawRequest();
+    private void verifyRefundNotifyRequest(PaymentTransactionRefundEventRequest request, Map<String, String> params) {
+        verifySign(params);
         String transactionRefundNo = request.getTransactionRefundSn();
-        BigDecimal refundAmount = request.getOrderAmount().fen2Yuan();
+        BigDecimal orderAmount = request.getOrderAmount().fen2Yuan();
+        BigDecimal refundAmount = request.getRefundAmount().fen2Yuan();
 
-        boolean paramVerify = Objects.equals(transactionRefundNo, params.get("out_trade_no"))
-                && Objects.equals(refundAmount.toString(), params.get("refund_fee"));
+        boolean paramVerify = Objects.equals(transactionRefundNo, params.get("out_biz_no"))
+                && orderAmount.compareTo(parseAmount(params, "total_amount")) == 0
+                && refundAmount.compareTo(parseAmount(params, "refund_fee")) == 0;
         AssertUtils.isTrue(paramVerify, String.format("支付宝退款通知，【%s】参数验证失败，%s", transactionRefundNo, params));
-        verifySign(request.getRawRequest());
     }
 
 
     /**
      * 验证签名
      *
-     * @param request 回调参数
+     * @param params 回调参数
      */
-    private void verifySign(AlipayAsyncNotificationRequest request) {
-        // 签名验证
-        Map<String, String> signParams = new HashMap<>();
-        // 深 Copy
-        Map<String, String> params = JSON.parseObject(JSON.toJSONString(request), new TypeReference<Map<String, String>>() {
-        });
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            String key = entry.getKey();
-            if (entry.getValue() != null) {
-                signParams.put(key, entry.getValue());
-            }
-        }
+    private void verifySign(Map<String, String> params) {
+        Map<String, String> signParams = new HashMap<>(params);
         AliPayPartnerConfig.EncryptType signType = AliPayPartnerConfig.EncryptType.valueOf(params.get("sign_type"));
         try {
             // 切记 rsaPublicKey 是支付宝的公钥，请去 open.alipay.com 对应应用下查看。
@@ -347,6 +332,34 @@ public abstract class AbstractAlipayPaymentPlugin implements PaymentTransactionP
             AssertUtils.isTrue(result, "支付宝通知签名验证失败");
         } catch (AlipayApiException exception) {
             throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, "支付宝支付通知签名验证异常", exception);
+        }
+    }
+
+    private static Map<String, String> getNotificationParams(Object rawRequest) {
+        if (!(rawRequest instanceof Map<?, ?> rawParams)) {
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, "支付宝通知原始请求参数必须为 Map<String, String>");
+        }
+        Map<String, String> result = new HashMap<>();
+        for (Map.Entry<?, ?> entry : rawParams.entrySet()) {
+            if (!(entry.getKey() instanceof String key)
+                    || entry.getValue() != null && !(entry.getValue() instanceof String)) {
+                throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, "支付宝通知原始请求参数必须为 Map<String, String>");
+            }
+            result.put(key, (String) entry.getValue());
+        }
+        return result;
+    }
+
+    private static BigDecimal parseAmount(Map<String, String> params, String name) {
+        String value = params.get(name);
+        if (StringUtils.isBlank(value)) {
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR, String.format("支付宝通知金额参数缺失，%s", name));
+        }
+        try {
+            return new BigDecimal(value);
+        } catch (NumberFormatException exception) {
+            throw new PaymentTransactionException(DefaultExceptionCode.COMMON_ERROR,
+                    String.format("支付宝通知金额参数格式错误，%s", name), exception);
         }
     }
 

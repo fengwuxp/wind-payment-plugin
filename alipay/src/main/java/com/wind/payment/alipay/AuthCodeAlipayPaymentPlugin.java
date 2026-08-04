@@ -1,11 +1,11 @@
 package com.wind.payment.alipay;
 
-import com.alibaba.fastjson2.JSON;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.domain.AlipayTradePayModel;
 import com.alipay.api.request.AlipayTradePayRequest;
 import com.alipay.api.response.AlipayTradePayResponse;
 import com.wind.common.exception.DefaultExceptionCode;
+import com.wind.jackson.WindJson;
 import com.wind.payment.alipay.request.AliPayAuthCodePaymentRequest;
 import com.wind.payment.core.PaymentTransactionException;
 import com.wind.payment.core.request.PrePaymentOrderRequest;
@@ -29,7 +29,7 @@ public class AuthCodeAlipayPaymentPlugin extends AbstractAlipayPaymentPlugin {
     private static final String ALI_FACE_PAY_PRODUCT_CODE = "FACE_TO_FACE_PAYMENT";
 
     public AuthCodeAlipayPaymentPlugin(String config) {
-        this(JSON.parseObject(config, AliPayPartnerConfig.class));
+        this(WindJson.parseObject(config, AliPayPartnerConfig.class));
     }
 
     public AuthCodeAlipayPaymentPlugin(AliPayPartnerConfig config) {

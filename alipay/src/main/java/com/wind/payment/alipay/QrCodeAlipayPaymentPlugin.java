@@ -1,11 +1,11 @@
 package com.wind.payment.alipay;
 
-import com.alibaba.fastjson2.JSON;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.domain.AlipayTradePrecreateModel;
 import com.alipay.api.request.AlipayTradePrecreateRequest;
 import com.alipay.api.response.AlipayTradePrecreateResponse;
 import com.wind.common.exception.DefaultExceptionCode;
+import com.wind.jackson.WindJson;
 import com.wind.payment.alipay.response.AliPayQrCodeTransactionPayResult;
 import com.wind.payment.core.PaymentTransactionException;
 import com.wind.payment.core.request.PrePaymentOrderRequest;
@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class QrCodeAlipayPaymentPlugin extends AbstractAlipayPaymentPlugin {
 
     public QrCodeAlipayPaymentPlugin(String config) {
-        this(JSON.parseObject(config, AliPayPartnerConfig.class));
+        this(WindJson.parseObject(config, AliPayPartnerConfig.class));
     }
 
     public QrCodeAlipayPaymentPlugin(AliPayPartnerConfig config) {
